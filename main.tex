@@ -1,0 +1,282 @@
+%\documentclass[a4paper]{article}
+\documentclass[sigconf]{acmart}
+
+\fancyhf{} % Remove fancy page headers 
+\fancyfoot[C]{\thepage}
+\setcopyright{none} % No copyright notice required for submissions
+%\usepackage[small,compact]{titlesec}
+\usepackage{caption}
+\usepackage{enumitem}
+\settopmatter{printacmref=false, printccs=false, printfolios=true} % We want page numbers on submissions
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+%\usepackage[a4paper,top=1cm,bottom=1.5cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{hyperref}
+\urlstyle{sf}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{balance}
+% For figures
+\usepackage{graphicx} % more modern
+%\usepackage{epsfig} % less modern
+\usepackage{subfigure} 
+\usepackage{caption}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{hyperref}
+%\urlstyle{sf}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{balance}
+\usepackage{float}
+
+\newcommand{\ak}[1]{\textcolor{blue}{\bf\small [#1 --Aleksandra]}}
+\newcommand{\yd}[1]{\textcolor{violet}{\bf\small [#1 --Yatharth]}}
+\newcommand{\todo}[1]{\textcolor{red}{TODO: {#1}}}
+\newcommand\TODO[1]{\textcolor{red}{TODO: {#1}}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{obs}{Observation}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem*{cor}{Corollary}
+
+\title{The Power of The Hybrid Model for Mean Estimation}
+%\author{Yatharth, Aleksandra}
+
+\begin{document}
+\maketitle
+
+\section{Motivation and Setup}
+
+In this paper we explore the power of the hybrid model \cite{blender} of differential privacy (DP). In particular, we study the accuracy of mean estimation algorithms for arbitrary distribution in bounded support. \todo{Motivate the hybrid model?}
+
+The data consists of data of $n$ individuals, where an individual $i \in [n]$ has data $x_i \in [0, m]$ drawn from distribution $\mathcal{D}$. The analyst only sees the original data of the $n_0 = c n$ individuals who opt in to the trusted curator model (TCM) of differential privacy. The rest of the $n_1 = (1-c) n$ individuals prefer the local model (LM) of differential privacy, where each individual randomizes their own data to satisfy $\epsilon$-DP and submits the noisy sample to the analyst. The analyst would like to estimate the sample mean of the $n$ individuals such that each individual's preference for privacy is satisfied. Assuming all $n$ samples are drawn from the same distribution $\mathcal{D}$, there are two ways we can conduct this analysis without hybridization. One way is to preserve local DP for everyone — where all $n$ individuals randomize their data and give the noisy data to the analyst who then calculates the mean of the noisy data. The second way is to throw away the $n_1$ individuals who prefer local DP, and calculate the mean of the $n_0$ opt-in samples while preserving differential privacy — say, using the Laplace mechanism. Here, we explore how much we can improve the accuracy of our estimate by using an optimal naive hybrid mechanism. 
+
+We also explored the idea of analyzing the performance of hybrid- differentially private mechanisms in terms of their sample complexity (i.e. show that the number of samples sufficient to get an accurate estimate with high probability is less than the number of samples necessary to achieve the same for the benchmark mechanisms), but this proved difficult for several reasons. First, we found that the bound on the concentration of the sum Laplace random variables given in \cite{Chan:2011:PCR:2043621.2043626} are nice to work with analytically, but are much too weak to provide the separation we would like to show. In addition, the inherent lack of strength of the union bound limits what we can say about errors with several terms in their algebraic expressions. Another measure of performance we looked at was absolute error. The trouble with this approach came from the difficulty in integrating one-sided probability density functions that arose from the convolution of several random variables, whether it was several Laplace random variables or a Laplace random variable and a Normal random variable. Finally, we decided that mean squared error was both comparatively straight-forward to calculate and, because of this, gave us a much more precise characterization of the performance of our mechanism against the benchmarks. 
+
+\section{Models and Notation}
+We use $\theta = \frac{1}{n}\sum_{i \in [n]}x_i$ to represent the sample mean of all $n$ individuals. $\hat{\theta}$ will represent our $\epsilon$-DP estimate of the sample mean. We use $\theta_0 = \frac{1}{n_0}\sum_{i \in \{1, \dots, n_0\}} x_i$ to represent the sample mean of the $n_0$ opt-in samples and $\hat{\theta}_0$ is our $\epsilon$-DP estimate of $\theta_0$ that satisfies TCM differential privacy. $\theta_1 = \frac{1}{n_1}\sum_{i \in \{n_0+1, \dots, n\}} x_i$ represents the sample mean of the $n_1$ individuals who prefer LM differential privacy and $\hat{\theta}_1$ is our $\epsilon$-DP estimate of $\theta_1$ that satisfies LM differential privacy. 
+
+We will analyze three different mechanisms for private estimation of the mean. 
+\begin{enumerate}
+\item OnlyTCM considers the mechanism where we use only the $n_0$ opt-in samples to estimate the mean of all $n$ samples and perturb the estimate using the Laplace mechanism. 
+\item FullLM considers the case where we satisfy LM $\epsilon$-DP for all $n$ samples — each individual randomizes their own data using the Laplace mechanism before submitting it to the curator.  
+\item Hybrid outputs a convex combination of the sample mean estimates of the two subsamples — the $n_0$ opt-in individuals and the $n_1$ individuals who prefer local DP.
+\end{enumerate}
+How the weight of the combination is decided will be further discussed in a later section. 
+
+\section{Preliminaries}
+
+\todo{Properties of variance, CLT, Distribution of difference of two sample means?}
+
+In this paper, we derive expected squared errors using the moment generating functions (mgf) of certain distributions. Therefore, throughout this section we present the relevant functions and derive the second moment about the origin for each function. These expressions can then be used directly in calculating the expected squared errors of the next section. 
+
+\begin{lem}[2nd moment about origin, Laplace distribution]
+Let $X \sim Lap(b)$. Then, 
+
+$$E[X^2] = 2b^2.$$
+\end{lem}
+
+\begin{proof}
+The moment generating function for $X$ is 
+
+$$M_X(t) = \frac{1}{1 - t^2b^2}.$$
+
+Then,
+
+$$M''_X(t) = -\frac{2b^2(3b^2t^2 + 1)}{(b^2t^2 - 1)^3}.$$
+
+Plugging in $t = 0$, we get 
+
+$$E[X^2] = M''_X(0) = -\frac{2b^2}{(-1)^3} = 2b^2.$$
+\end{proof}
+
+The Normal random variables we encounter throughout this paper have $\mu = 0$, and so we can focus on the central moments of the Normal distribution.
+
+\begin{lem}[2nd central moment about origin, Normal distribution \cite{papoulis2002probability}]
+Let $X \sim Nor(0, \sigma^2)$. Then,
+
+$$E[X^2] = \sigma^2.$$
+\end{lem}
+
+An error we consider may be the sum of a Laplace random variable and a Normal random variable. Thus, characterizing the distribution of such a random variable will prove essential.
+
+\begin{definition}[Normal-Laplace distribution \cite{Reed2006}]
+A random variable $Y \overset{d}{=} Z + W$ where $Z \sim Nor(\mu, \sigma^2)$ and $W \sim Lap(b)$ is distributed according to the Normal-Laplace distribution, which we denote $Y \sim NL(\mu, \sigma^2, b)$.
+\end{definition}
+
+As we did with the Normal distribution above, we focus on central moments of the Normal-Laplace distribution.
+
+\begin{lem}[2nd central moment about origin, Normal-Laplace distribution]
+\label{nl_secmom}
+Let $X \sim NL(0, \sigma^2, b)$. Then, 
+
+$$E[X^2] = \sigma^2 + 2b^2.$$
+\end{lem}
+
+\begin{proof}
+The moment generating function for $X$ is
+
+$$M_X(t) = \frac{\exp(\sigma^2t^2/2)}{1 - b^2t^2}.$$
+
+Then, as the lemma states
+
+$$E[X^2] = M''_X(0) = \sigma^2 + 2b^2.$$
+\end{proof}
+
+We will also need to use the following property of the Laplace distribution in our analysis of the Hybrid mechanism in the following section. 
+
+\begin{lem} \label{wtimeslap}
+Let $X \sim Lap(b)$ and $Y = wX$ where $w \in [0,1]$ is a constant. Then, 
+
+$$Y \sim Lap(wb).$$
+\end{lem}
+
+\begin{proof}
+Let $F_X$ be the cumulative distribution function (cdf) of $X$ and $f_X$ be the probability density function (pdf) of $X$. Let $F_Y$ and $f_Y$ be the same for $Y$. Then, by definition we have 
+$$F_Y(y) = Pr[Y \leq y] = Pr[X \leq y/w] = F_X(y/w).$$
+	
+Evaluating the cdf of the Laplace distribution at $y/w$, we get 
+$$F_X(y/w) = 
+	\begin{cases} 
+      \frac{1}{2}e^{\frac{y}{bw}} & y < 0 \\
+      1 - \frac{1}{2}e^{-\frac{y}{bw}} & y \geq 0 
+	\end{cases} .$$
+	
+Finally we translate the cdfs to pdfs and the lemma follows immediately, 
+$$f_Y(b) = \frac{d}{dy}F_Y(y) = \frac{d}{dy}F_X(y/w) $$
+$$= \frac{1}{2bw}
+	\begin{cases} 
+      e^{\frac{y}{bw}} & y < 0 \\
+      e^{-\frac{y}{bw}} & y \geq 0 
+	\end{cases}
+     = f_X(wb).$$
+\end{proof}
+
+
+
+\section{Performance of Hybrid Mechanism}
+
+In this section we study the hybrid mechanism and the accuracy improvement it provides over the benchmarks, OnlyTCM and FullLM. We study the accuracy of these mechanisms by modeling their errors as random variables and studying their expectations. Throughout this section we use the following terminology. The distribution $\mathcal{D}$ from which samples are drawn has support $[0,m]$ and variance $\sigma^2$. $\epsilon$ is the privacy parameter — we satisfy $\epsilon$-DP, whether in the LM or TCM. $c$ is the proportion of samples that opt in to the trusted curator model. In typical applications, we expect $c$ to be a small constant. 
+
+\begin{lem}[Expected squared error of FullLM]
+\label{MSE_FullLM}
+FullLM has expected squared error
+
+$$E[(\hat{\theta} - \theta)^2] = \frac{2m^2}{n\epsilon^2}$$
+\end{lem}
+
+\begin{proof}
+FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n$ random variables distributed according to $Lap(m/\epsilon)$. Then clearly, $\hat{\theta} - \theta = Z/n$ and therefore, by the Central Limit Theorem, $Z \sim Nor(0, 2nm^2/\epsilon^2)$ and the lemma follows. 
+\end{proof}
+
+\begin{lem}[Expected squared error of OnlyTCM]
+\label{MSE_OnlyTCM}
+OnlyTCM has expected squared error
+
+$$E[(\hat{\theta} - \theta)^2] = \frac{1}{cn}\left((1-c)\sigma^2 + \frac{2m^2}{cn \epsilon^2 }\right).$$
+\end{lem}
+
+\begin{proof}
+OnlyTCM returns the estimate $\hat{\theta} = \hat{\theta}_0$. Then we would like to study the following decomposition of the error
+$$\hat{\theta} - \theta = (\hat{\theta}_0 - \theta_0) + (1-c)(\theta_0 - \theta_1).$$
+
+The first term is a Laplace random variable
+$$\hat{\theta}_0 - \theta_0 \sim Lap\left(\frac{m}{cn\epsilon}\right).$$
+
+The second term is the difference of two sample means, so by Central Limit Theorem and the difference of Normally distributed random variables
+$$(1-c)(\theta_0 - \theta_1) \sim Nor\left(0, \frac{(1-c)\sigma^2}{cn}\right).$$
+
+Therefore, our error follows a Normal-Laplace distribution
+$$\hat{\theta} - \theta \sim NL\left(0, \frac{(1-c)\sigma^2}{cn}, \frac{m}{cn\epsilon} \right).$$
+
+The lemma follows from Lemma \ref{nl_secmom}.
+\end{proof}
+
+\begin{lem}[Expected squared error of Hybrid]
+Hybrid has expected squared error 
+
+$$E[(\hat{\theta} - \theta)^2] = \frac{1}{(1-c)n}\left(\frac{(w^*-c)^2\sigma^2}{c} + \frac{2(1-w^*)^2 m^2}{\epsilon^2}\right) + \frac{2m^2w^{*2}}{c^2n^2\epsilon^2}$$
+
+where
+
+$$w^* = \frac{\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) n}}{\frac{4 m^2}{c^2 \epsilon^2 n^2}+\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) c n}}$$
+\end{lem}
+
+\begin{proof}
+The hybrid mechanism returns the estimate, where $w \in [0,1]$,
+
+$$\hat{\theta} = w\hat{\theta}_0 + (1-w)\hat{\theta}_1.$$
+
+We prove the optimality of $w^*$ at the end of this proof. For now, we study distribution of the following decomposition of the error
+
+$$\hat{\theta} - \theta = w(\hat{\theta}_0 - \theta_0) + (1-w)(\hat{\theta}_1 - \theta_1) + (w-c)(\theta_0 - \theta_1).$$
+
+Notice that each of the terms in the above equation follow familiar distributions. In particular, the first term is simply a weight times the Laplace noise we add to the sample mean of the opt-in data. So, by Lemma \ref{wtimeslap},
+
+$$w(\hat{\theta}_0 - \theta_0) \sim Lap\left(\frac{wm}{cn\epsilon}\right).$$
+
+The second term is a weight times the sum of the Laplace noise that occurs from each local randomization. Then, by the Central Limit Theorem,
+
+$$(1-w)(\hat{\theta}_1 - \theta_1) \sim Nor\left(0, \frac{2(1-w)^2 m^2}{(1-c)n\epsilon^2}\right).$$
+
+The third term is the difference of two sample means, therefore, by Central Limit Theorem and the difference of two Normally distributed random variables, 
+
+$$(w-c)(\theta_0 - \theta_1) \sim Nor\left(0, \frac{(w-c)^2\sigma^2}{(1-c)cn}\right).$$
+
+Putting these together, we see that our error is distributed according to the following instantiation of the Normal-Laplace distribution
+
+$$\hat{\theta} - \theta \sim NL\left(0, \frac{1}{(1-c)n}\left(\frac{(w-c)^2\sigma^2}{c} + \frac{2(1-w)^2 m^2}{\epsilon^2}\right), \frac{wm}{cn\epsilon}\right).$$
+
+Then, it is easy to see by first order optimality that $w^*$ minimizes $E[(\hat{\theta} - \theta)^2]$.
+\end{proof}
+
+We can now analyze the improvement afforded by the optimal naive Hybrid mechanism presented above. We compare to the best of the two benchmarks. This depends on several parameters because the accuracy of OnlyTCM and FullLM vary with the parameters as can be seen by Lemmas \ref{MSE_FullLM} and \ref{MSE_OnlyTCM}. 
+
+\begin{thm}[Hybrid vs. benchmarks]
+Define $MSE_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $MSE_{\text{OnlyTCM}}$, $MSE_{\text{Hybrid}}$ be similarly defined.
+Let 
+$$R = \frac{\min(MSE_{\text{FullLM}}, MSE_{\text{OnlyTCM}})}{MSE_{\text{Hybrid}}}$$.
+Then, 
+
+$$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}$$
+
+where 
+
+$$\gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$$
+\end{thm}
+
+Let $$c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$$ and let $$n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$$ Then, if $c>c_{\text{critical}}$ and $n > n_{\text{critical}}$, OnlyTCM has a smaller error than FullLM.
+
+\begin{cor}
+The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $$R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}$$
+\end{cor}
+
+\begin{figure}[h]
+\includegraphics[width=0.45\textwidth]{eps01c01.pdf}
+\caption{Relative performance of models for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=0.45\textwidth]{imp_eps01c01.pdf}
+\caption{Multiplicative improvement given by Hybrid (R) for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\end{figure}
+
+
+\section{Conclusions}
+and future work
+
+%\balance
+\bibliography{hybrid}
+\bibliographystyle{ACM-Reference-Format}
+\end{document}
