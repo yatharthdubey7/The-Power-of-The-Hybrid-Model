@@ -1,13 +1,15 @@
 %\documentclass[a4paper]{article}
-\documentclass[sigconf]{acmart}
+%\documentclass[sigconf]{acmart}
+\documentclass{article}
+\usepackage{nips_2018}
 
-\fancyhf{} % Remove fancy page headers 
-\fancyfoot[C]{\thepage}
-\setcopyright{none} % No copyright notice required for submissions
+%\fancyhf{} % Remove fancy page headers 
+%\fancyfoot[C]{\thepage}
+%\setcopyright{none} % No copyright notice required for submissions
 %\usepackage[small,compact]{titlesec}
 \usepackage{caption}
 \usepackage{enumitem}
-\settopmatter{printacmref=false, printccs=false, printfolios=true} % We want page numbers on submissions
+%\settopmatter{printacmref=false, printccs=false, printfolios=true} % We want page numbers on submissions
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -20,6 +22,7 @@
 %% Useful packages
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{hyperref}
+\usepackage{url}
 \urlstyle{sf}
 \usepackage{xcolor}
 \usepackage{color}
@@ -49,12 +52,16 @@
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem*{cor}{Corollary}
+\newtheorem{defn}[thm]{Definition}
 
 \title{The Power of The Hybrid Model for Mean Estimation}
-%\author{Yatharth, Aleksandra}
+%\author{Anonymized}
 
 \begin{document}
 \maketitle
+
+\begin{abstract}
+\end{abstract}
 
 \section{Motivation and Setup}
 
@@ -111,9 +118,9 @@ $$E[X^2] = \sigma^2.$$
 
 An error we consider may be the sum of a Laplace random variable and a Normal random variable. Thus, characterizing the distribution of such a random variable will prove essential.
 
-\begin{definition}[Normal-Laplace distribution \cite{Reed2006}]
+\begin{defn}[Normal-Laplace distribution \cite{Reed2006}]
 A random variable $Y \overset{d}{=} Z + W$ where $Z \sim Nor(\mu, \sigma^2)$ and $W \sim Lap(b)$ is distributed according to the Normal-Laplace distribution, which we denote $Y \sim NL(\mu, \sigma^2, b)$.
-\end{definition}
+\end{defn}
 
 As we did with the Normal distribution above, we focus on central moments of the Normal-Laplace distribution.
 
@@ -277,6 +284,7 @@ The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $$
 and future work
 
 %\balance
+\small
 \bibliography{hybrid}
 \bibliographystyle{ACM-Reference-Format}
 \end{document}
