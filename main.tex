@@ -7,7 +7,7 @@
 %\fancyfoot[C]{\thepage}
 %\setcopyright{none} % No copyright notice required for submissions
 %\usepackage[small,compact]{titlesec}
-\usepackage{caption}
+
 \usepackage{enumitem}
 %\settopmatter{printacmref=false, printccs=false, printfolios=true} % We want page numbers on submissions
 
@@ -132,7 +132,6 @@ We will also need to use the following property of the Laplace distribution in o
 Let $X \sim Lap(b)$ and $Y = wX$ where $w \in [0,1]$ is a constant. Then, 
 $Y \sim Lap(wb).$
 \end{lem}
-
 \begin{proof}
 Let $F_X$ be the cumulative distribution function (cdf) of $X$ and $f_X$ be the probability density function (pdf) of $X$. Let $F_Y$ and $f_Y$ be the same for $Y$. Then, by definition we have 
 $F_Y(y) = Pr[Y \leq y] = Pr[X \leq y/w] = F_X(y/w).$
@@ -157,7 +156,6 @@ $= \frac{1}{2bw}
 
 
 \section{Performance of Hybrid Mechanism}
-
 In this section we study the hybrid mechanism and the accuracy improvement it provides over the benchmarks, OnlyTCM and FullLM. We study the accuracy of these mechanisms by modeling their errors as random variables and studying their expectations. Throughout this section we use the following terminology. The distribution $\mathcal{D}$ from which samples are drawn has support $[0,m]$ and variance $\sigma^2$. $\epsilon$ is the privacy parameter — we satisfy $\epsilon$-DP, whether in the LM or TCM. $c$ is the proportion of samples that opt in to the trusted curator model. In typical applications, we expect $c$ to be a small constant. 
 
 \begin{lem}[Expected squared error of FullLM]
@@ -165,7 +163,6 @@ In this section we study the hybrid mechanism and the accuracy improvement it pr
 FullLM has expected squared error
 $E[(\hat{\theta} - \theta)^2] = \frac{2m^2}{n\epsilon^2}$
 \end{lem}
-
 \begin{proof}
 FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n$ random variables distributed according to $Lap(m/\epsilon)$. Then clearly, $\hat{\theta} - \theta = Z/n$ and therefore, by the Central Limit Theorem, $Z \sim Nor(0, 2nm^2/\epsilon^2)$ and the lemma follows. 
 \end{proof}
@@ -175,7 +172,6 @@ FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n
 OnlyTCM has expected squared error
 $E[(\hat{\theta} - \theta)^2] = \frac{1}{cn}\left((1-c)\sigma^2 + \frac{2m^2}{cn \epsilon^2 }\right).$
 \end{lem}
-
 \begin{proof}
 OnlyTCM returns the estimate $\hat{\theta} = \hat{\theta}_0$. Then we would like to study the following decomposition of the error
 $\hat{\theta} - \theta = (\hat{\theta}_0 - \theta_0) + (1-c)(\theta_0 - \theta_1).$
@@ -189,7 +185,7 @@ $(1-c)(\theta_0 - \theta_1) \sim Nor\left(0, \frac{(1-c)\sigma^2}{cn}\right).$
 Therefore, our error follows a Normal-Laplace distribution
 $\hat{\theta} - \theta \sim NL\left(0, \frac{(1-c)\sigma^2}{cn}, \frac{m}{cn\epsilon} \right).$
 
-The lemma follows from Lemma \ref{nl_secmom}.
+The lemma follows from Lemma~\ref{nl_secmom}.
 \end{proof}
 
 \begin{lem}[Expected squared error of Hybrid]
@@ -222,7 +218,7 @@ Then, it is easy to see by first order optimality that $w^*$ minimizes $E[(\hat{
 
 We can now analyze the improvement afforded by the optimal naive Hybrid mechanism presented above. We compare to the best of the two benchmarks. This depends on several parameters because the accuracy of OnlyTCM and FullLM vary with the parameters as can be seen by Lemmas \ref{MSE_FullLM} and \ref{MSE_OnlyTCM}. 
 
-\begin{thm}[Hybrid vs. benchmarks]
+\begin{thm}[Hybrid vs. Benchmarks]
 Define $MSE_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $MSE_{\text{OnlyTCM}}$, $MSE_{\text{Hybrid}}$ be similarly defined.
 Let 
 $R = \frac{\min(MSE_{\text{FullLM}}, MSE_{\text{OnlyTCM}})}{MSE_{\text{Hybrid}}}$.
@@ -235,19 +231,24 @@ $\gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n
 Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ Then, if $c>c_{\text{critical}}$ and $n > n_{\text{critical}}$, OnlyTCM has a smaller error than FullLM. While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
 
 \begin{cor}
-The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}$
+The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}.$
 \end{cor}
 
-\begin{figure}[h]
-\includegraphics[width=0.5\textwidth]{eps01c01.pdf}
+\begin{figure}[t]
+%\centering
+\begin{minipage}{.45\textwidth}
+\includegraphics[width=0.9\linewidth]{eps01c01.pdf}
 \caption{Relative performance of models for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\end{minipage}
 \end{figure}
 
-\begin{figure}[h]
-\includegraphics[width=0.5\textwidth]{imp_eps01c01.pdf}
+\begin{figure}[t]
+%\centering
+\begin{minipage}{.45\textwidth}
+\includegraphics[width=0.9\linewidth]{imp_eps01c01.pdf}
 \caption{Multiplicative improvement (R) given by Hybrid for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\end{minipage}
 \end{figure}
-
 
 \section{Conclusions and Future Directions}
 In this work, we looked at the accuracy of mean estimation algorithms in a hybrid trust environment and how an optimally tuned naive hybrid mechanism improves accuracy guarantees over natural benchmarks. In particular, we showed that using a convex combination of the trusted-curator DP estimate of the opt-in samples and the mean of the locally randomized samples can do a constant factor better for a large range of sample sizes, where the constant factor depends on several parameters. While for the problem of mean estimation, we were able to only do a constant factor better, we believe that there is more promise in considering hybrid mechanisms for more complex problems. \cite{Kasiviswanathan:2011:WLP:2078965.2078976} show that there exists separation between the class of problems that can be solved in the non-interactive local model and those that can be solved in the interactive local model. We conjecture that a hybrid mechanism that uses the opt-in samples to inform the local randomization can buy an increase in power similar to what is bought by interactivity. Therefore, a natural extension to our work is to show separation the above separation for hybrid DP and local DP, in particular, we would like to show that hybrid DP allows us to solve a natural variant of the masked parity problem from \cite{Kasiviswanathan:2011:WLP:2078965.2078976} that remains hard in the non-interactive local DP setting. A more specific, but still powerful and interesting, result would be to show that hybrid mechanisms perform better in a hybrid trust setting than the natural benchmarks for all counting queries. \cite{Blum:2005:PPS:1065167.1065184} show that counting queries are a powerful primitive that captures a large variety of machine learning and data-mining tasks, and therefore, showing that hybrid mechanisms can largely improve privacy-accuracy trade-offs for this class of queries would hopefully increase the adoption of differential privacy in application settings with a hybrid trust model. 
