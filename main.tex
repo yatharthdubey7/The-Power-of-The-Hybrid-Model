@@ -86,8 +86,7 @@ We will analyze three different mechanisms for private estimation of the mean.
 How the weight of the combination is decided will be further discussed in a later section. 
 
 \section{Preliminaries}
-
-In this paper, we derive expected squared errors using the moment generating functions (mgf) of certain distributions. Therefore, throughout this section we present the relevant functions and derive the second moment about the origin for each function. These expressions can then be used directly in calculating the expected squared errors of the next section. 
+We derive expected squared errors using the moment generating functions (mgf) of certain distributions. Therefore, throughout this section we present the relevant functions and derive the second moment about the origin for each function. These expressions can then be used directly in calculating the expected squared errors of the next section. 
 
 \begin{lem}[2nd moment about origin, Laplace distribution]
 Let $X \sim Lap(b)$. Then, $E[X^2] = 2b^2.$
@@ -216,7 +215,7 @@ $\hat{\theta} - \theta \sim NL\left(0, \frac{1}{(1-c)n}\left(\frac{(w-c)^2\sigma
 Then, it is easy to see by first order optimality that $w^*$ minimizes $E[(\hat{\theta} - \theta)^2]$.
 \end{proof}
 
-We can now analyze the improvement afforded by the optimal naive Hybrid mechanism presented above. We compare to the best of the two benchmarks. This depends on several parameters because the accuracy of OnlyTCM and FullLM vary with the parameters as can be seen by Lemmas \ref{MSE_FullLM} and \ref{MSE_OnlyTCM}. 
+We can now analyze the improvement afforded by the optimal naive Hybrid mechanism presented above. We compare to the best of the two benchmarks. This depends on several parameters because the accuracy of OnlyTCM and FullLM vary with the parameters as per Lemmas~\ref{MSE_FullLM} and~\ref{MSE_OnlyTCM}. 
 
 \begin{thm}[Hybrid vs. Benchmarks]
 Define $MSE_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $MSE_{\text{OnlyTCM}}$, $MSE_{\text{Hybrid}}$ be similarly defined.
@@ -238,7 +237,7 @@ The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R
 %\centering
 \begin{minipage}{.45\textwidth}
 \includegraphics[width=0.9\linewidth]{eps01c01.pdf}
-\caption{Relative performance of models for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\caption{Relative performance of models for $c=0.01, \epsilon=0.1, m=1, \sigma = m/6$}
 \end{minipage}
 \end{figure}
 
@@ -246,7 +245,7 @@ The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R
 %\centering
 \begin{minipage}{.45\textwidth}
 \includegraphics[width=0.9\linewidth]{imp_eps01c01.pdf}
-\caption{Multiplicative improvement (R) given by Hybrid for $c=0.01, eps=0.1, m=1, \sigma = m/6$}
+\caption{Multiplicative improvement (R) given by Hybrid for $c=0.01, \epsilon=0.1, m=1, \sigma = m/6$}
 \end{minipage}
 \end{figure}
 
