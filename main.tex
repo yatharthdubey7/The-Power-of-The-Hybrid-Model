@@ -80,7 +80,7 @@ We use $\theta = \frac{1}{n}\sum_{i \in [n]}x_i$ to represent the sample mean of
 We will analyze three different mechanisms for private estimation of the mean. 
 \begin{enumerate}
 \item OnlyTCM considers the mechanism where we use only the $n_0$ opt-in samples to estimate the mean of all $n$ samples and perturb the estimate using the Laplace mechanism. 
-\item FullLM considers the case where we satisfy LM $\epsilon$-DP for all $n$ samples — each individual randomizes their own data using the Laplace mechanism before submitting it to the curator.  
+\item FullLM considers the case where we satisfy LM $\epsilon$-DP for all $n$ samples — each individual randomizes their own data using the Laplace mechanism before submitting it to the curator. \cite{duchi} and \cite{dky18} show that the Laplace mechanism is, in fact, optimal for the problem of one-dimensional mean estimation in the local model. 
 \item Hybrid outputs a convex combination of the sample mean estimates of the two subsamples — the $n_0$ opt-in individuals and the $n_1$ individuals who prefer local DP.
 \end{enumerate}
 How the weight of the combination is decided will be further discussed in a later section. 
