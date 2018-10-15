@@ -260,16 +260,19 @@ Perhaps a more tractable result would be to show that hybrid mechanisms perform 
 
 \appendix
 \section{Related Sample Complexity Results}
+Let $\alpha$ be the accuracy parameter and $\beta$ be the confidence parameter. Then, the following table describes the sample complexities of algorithms for mean estimation in the local model and the trusted curator model. Note that  \cite{duchi} shows that the Laplace mechanism is optimal for one-dimensional mean estimation in both models of trust.
 \begin{center}
 \begin{tabular}{ |c|c|c| }
  \hline
- $\sim [0,1]$ & S. Complexity & Algorithm \\
+ $\sim [0,m]$ & S. Complexity & Algorithm \\ [1.5ex]
  \hline
- Local & $ \frac{8}{\epsilon^2 \alpha^2} \ln\left(\frac{2}{\delta}\right)$ & Laplace \\ 
+ Local & $ \frac{8}{\epsilon^2 \alpha^2} \ln\left(\frac{2}{\beta}\right)$ & Laplace \\ [1.5ex]
  \hline
- TCM & & Laplace \\
+ TCM & $\frac{1}{\epsilon \alpha}\ln\left(\frac{1}{\beta}\right)$ & Laplace \\ [1.5ex]
  \hline
 \end{tabular}
 \end{center}
+
+The sample complexity for the local model uses the concentration of the sum of i.i.d. Laplace random variables given in \cite{chan2011private}. The sample complexity for the trusted curator model comes from the accuracy statement of the Laplace mechanism in \cite{dmns06}.
 
 \end{document}
