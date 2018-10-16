@@ -80,7 +80,7 @@ In Section~\ref{sec:notation} we introduce the formal notation for exploring the
 
 
 \section{Models and Notation}\label{sec:notation}
-Each of the $n$ individuals $i \in [n]$ has data $x_i \in [0, m]$ drawn from distribution $\mathcal{D}$ with variance $\sigma^2$. The analyst only sees the original data of the $n_0 = c n$ individuals who opt-in to the trusted curator model of DP. The rest of the $n_1 = (1-c) n$ individuals prefer the local model of DP, where each individual randomizes their own data to satisfy $\epsilon$-DP and only then submits the sample to the analyst. Note that $c$ is the opt-in rate, and naturally must be bounded such that $c \in [0,1]$. Further, we expect $c$ to be small. The analyst would like to estimate the sample mean of the $n$ individuals such that each individual's trust preference is satisfied and $\epsilon$-DP is ensured. We use $\theta = \frac{1}{n}\sum_{i \in [n]}x_i$ to represent the true sample mean of all $n$ individuals. $\hat{\theta}$ will represent the analyst's $\epsilon$-DP estimate of the sample mean.
+Each of the $n$ individuals $i \in [n]$ has data $x_i \in [0, m]$ drawn from distribution $\mathcal{D}$\footnote{We leave the question of analyzing performance when the data of opt-in and local groups comes from different distributions to future work.} with variance $\sigma^2$. The analyst only sees the original data of the $n_0 = c n$ individuals who opt-in to the trusted curator model of DP. The rest of the $n_1 = (1-c) n$ individuals prefer the local model of DP, where each individual randomizes their own data to satisfy $\epsilon$-DP and only then submits the sample to the analyst. Note that $c$ is the opt-in rate, and naturally must be bounded such that $c \in [0,1]$. Further, we expect $c$ to be small. The analyst would like to estimate the sample mean of the $n$ individuals such that each individual's trust preference is satisfied and $\epsilon$-DP is ensured. We use $\theta = \frac{1}{n}\sum_{i \in [n]}x_i$ to represent the true sample mean of all $n$ individuals. $\hat{\theta}$ will represent the analyst's $\epsilon$-DP estimate of the sample mean.
 
 As discussed in the introduction, there are two natural benchmarks to compare with:
 \begin{enumerate}
@@ -93,17 +93,12 @@ As discussed in the introduction, there are two natural benchmarks to compare wi
 We explore how much we can improve the accuracy of our estimate by using a hybrid mechanism, which we call Hybrid. This mechanism calculates two subsample means while preserving exactly the privacy preferences of each subsample, i.e., Hybrid runs OnlyTCM on the opt-in data and FullLM on the data that prefers local DP. It then outputs a convex combination of these two subsample means, giving weight $w$ to the OnlyTCM estimate and $1-w$ to the FullLM estimate. 
 
 Let $\theta_1 = \frac{1}{n_1}\sum_{i \in \{n_0+1, \dots, n\}} x_i$ represent the true sample mean of the $n_1$ individuals who prefer LM differential privacy and $\hat{\theta}_1$ be the $\epsilon$-DP estimate of $\theta_1$ in the LM. %Note that $\hat{\theta}_1$ is obtained by running FullLM on the $n_1$ samples that prefer local randomization.
-Hybrid returns the estimate $\hat{\theta} = w^*\hat{\theta}_0 + (1-w^*)\hat{\theta}_1$.
-
-We will denote by $w^*$ the weight that minimizes the mean squared error of the estimate, and will derive it in Lemma \TODO{4.3}.
+Hybrid returns the estimate $\hat{\theta} = w^*\hat{\theta}_0 + (1-w^*)\hat{\theta}_1$, where $w^*$ the weight that minimizes the mean squared error of the estimate which we derive in Lemma~\ref{lem:hybrid-error}.
 
 %We use $\theta_0 = \frac{1}{n_0}\sum_{i \in \{1, \dots, n_0\}} x_i$ to represent the true sample mean of the $n_0$ opt-in samples and $\hat{\theta}_0$ for the $\epsilon$-DP estimate of $\theta_0$ that satisfies TCM differential privacy. Note that $\hat{\theta}_0$ is obtained by running OnlyTCM on the data. 
 
 
 
-\TODO{The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter.}
-
-\TODO{Assuming all $n$ samples are drawn from the same distribution}
 
 \section{Performance of Hybrid Mechanism}\label{sec:performance}
 In this section we study the hybrid mechanism and the accuracy improvement it provides over the benchmarks, OnlyTCM and FullLM. We study the accuracy of these mechanisms by modeling their errors as random variables and studying their expectations, in particular, their second moments about the origin. The derivations of second moments for the Laplace distribution, Normal distribution, and the Normal-Laplace distribution which are needed to compute the squared errors can be found in Appendix~\ref{sec:preliminaries}.
@@ -137,7 +132,7 @@ $\hat{\theta} - \theta \sim NL\left(0, \frac{(1-c)\sigma^2}{cn}, \frac{m}{cn\eps
 Thus, the conclusion follows from Lemma~\ref{nl_secmom}.
 \end{proof}
 
-\begin{lem}[Expected squared error of Hybrid]
+\begin{lem}[Expected squared error of Hybrid]\label{lem:hybrid-error}
 Hybrid has expected squared error 
 $E[(\hat{\theta} - \theta)^2] = \frac{1}{(1-c)n}\left(\frac{(w^*-c)^2\sigma^2}{c} + \frac{2(1-w^*)^2 m^2}{\epsilon^2}\right) + \frac{2m^2w^{*2}}{c^2n^2\epsilon^2}$
 where
@@ -185,6 +180,8 @@ The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R
 \ak{Can you elaborate further on Theorem 4.4. and Corollary implications, and write about the figures?}
 Theorem~\ref{thm:main} and its corollary provide a lower bound for the potential improvement provided by the hybrid model. Note that this improvement factor is 
 
+\TODO{The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter.}
+
 \begin{figure}[t]
 %\centering
 \begin{minipage}[t]{.49\textwidth}
@@ -206,6 +203,8 @@ In this work, we looked at the accuracy of mean estimation algorithms in a hybri
 Although for the problem of mean estimation, we were able to only do a constant factor better, we believe that there is more promise in considering hybrid mechanisms for more complex problems. \cite{Kasiviswanathan:2011:WLP:2078965.2078976} show that there exists separation between the class of problems that can be solved in the non-interactive local model and those that can be solved in the interactive local model. We conjecture that a hybrid mechanism that uses the opt-in samples to inform the local randomization can buy an increase in power similar to what is bought by interactivity. Therefore, a natural extension to our work is to show separation for hybrid DP and local DP. In particular, we would like to show that hybrid DP allows us to solve a natural variant of the masked parity problem from \cite{Kasiviswanathan:2011:WLP:2078965.2078976} that remains hard in the non-interactive local DP setting.
 
 Perhaps a more tractable result would be to show that hybrid mechanisms perform better than the natural benchmarks for all counting queries. \cite{Blum:2005:PPS:1065167.1065184} show that counting queries are a powerful primitive that captures a large variety of machine learning and data-mining tasks, and therefore, showing that hybrid mechanisms can improve privacy-accuracy trade-offs for this class of queries and quantifying by how much would illustrate the power and limitations that can be gained by relying on a hybrid trust model. 
+
+
 
 %\balance
 \small
