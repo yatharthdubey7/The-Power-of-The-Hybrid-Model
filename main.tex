@@ -84,16 +84,16 @@ Each of the $n$ individuals $i \in [n]$ has data $x_i \in [0, m]$ drawn from dis
 
 As discussed in the introduction, there are two natural benchmarks to compare with:
 \begin{enumerate}
-\item The fully local model in which noone opts-in to TCM, and therefore, the mechanism, which we will denote by FullLM, calculates the mean of the samples submitted to it after undergoing randomization necessary for ensuring local DP. \cite{duchi} and \cite{dky18} show that the Laplace mechanism is optimal for the problem of one-dimensional mean estimation in the local model, so wlog, we assume the samples are submitted after addition of properly calibrated Laplace noise~\cite{dmns06}. \TODO{Do we need notation here? We don't have it, as we are careless as to whether FullLM runs on $n$ or $n_1$}
+\item The fully local model in which noone opts-in to TCM, and therefore, the mechanism, which we will denote by FullLM, calculates the mean of the samples submitted to it after undergoing randomization necessary for ensuring local DP. \cite{duchi} and \cite{dky18} show that the Laplace mechanism is optimal for the problem of one-dimensional mean estimation in the local model, so wlog, we assume the samples are submitted after addition of properly calibrated Laplace noise~\cite{dmns06}. %\TODO{Do we need notation here? We don't have it, as we are careless as to whether FullLM runs on $n$ or $n_1$}
 \item The model in which we ignore the data submitted in the local model, and rely only on the $n_0$ opt-in samples to calculate the DP mean, a mechanism which we will denote by OnlyTCM. We use $\theta_0 = \frac{1}{n_0}\sum_{i \in \{1, \dots, n_0\}} x_i$ to represent the true sample mean of the $n_0$ opt-in samples and $\hat{\theta}_0$ for the $\epsilon$-DP estimate of $\theta_0$ that satisfies TCM differential privacy, which we will also compute using the properly calibrated Laplace noise~\cite{dmns06}.
 \end{enumerate}  
 
 %Assuming all $n$ samples are drawn from the same distribution $\mathcal{D}$, there are two ways to perform the estimate without hybridization. FullLM preserves local $\epsilon$-DP for all $n$ samples — each individual randomizes their own data using the Laplace mechanism before submitting it to the analyst. The analyst then calculates and outputs the mean of the noisy samples. \cite{duchi} and \cite{dky18} show that the Laplace mechanism is, in fact, optimal for the problem of one-dimensional mean estimation in the local model. The second mechanism, which we call OnlyTCM, uses only the $n_0$ opt-in samples to estimate the mean of all $n$ samples and perturbs the estimate using the Laplace mechanism.
 
-We explore how much we can improve the accuracy of our estimate by using a hybrid mechanism, which we call Hybrid. This mechanism calculates two subsample means while preserving exactly the privacy preferences of each subsample, i.e., Hybrid runs OnlyTCM on the opt-in data and FullLM on the data that prefers local DP. It then outputs a convex combination of these two subsample means, giving weight $w$ to the OnlyTCM estimate and $1-w$ to the FullLM estimate. 
-
-Let $\theta_1 = \frac{1}{n_1}\sum_{i \in \{n_0+1, \dots, n\}} x_i$ represent the true sample mean of the $n_1$ individuals who prefer LM differential privacy and $\hat{\theta}_1$ be the $\epsilon$-DP estimate of $\theta_1$ in the LM. %Note that $\hat{\theta}_1$ is obtained by running FullLM on the $n_1$ samples that prefer local randomization.
-Hybrid returns the estimate $\hat{\theta} = w^*\hat{\theta}_0 + (1-w^*)\hat{\theta}_1$, where $w^*$ the weight that minimizes the mean squared error of the estimate which we derive in Lemma~\ref{lem:hybrid-error}.
+We explore how much we can improve the accuracy of our estimate by using a hybrid mechanism, which we call Hybrid. This mechanism calculates two subsample means while preserving exactly the privacy preferences of each subsample, and outputs the convex combination of the two.
+%i.e., Hybrid runs OnlyTCM on the opt-in data and FullLM on the data that prefers local DP. It then outputs a convex combination of these two subsample means, giving weight $w$ to the OnlyTCM estimate and $1-w$ to the FullLM estimate. 
+Specifically, let $\theta_1 = \frac{1}{n_1}\sum_{i \in \{n_0+1, \dots, n\}} x_i$ represent the true sample mean of the $n_1$ individuals who prefer LM differential privacy and $\hat{\theta}_1$ be the $\epsilon$-DP estimate of $\theta_1$ in the LM. %Note that $\hat{\theta}_1$ is obtained by running FullLM on the $n_1$ samples that prefer local randomization.
+Hybrid returns an estimate $\hat{\theta} = w\hat{\theta}_0 + (1-w)\hat{\theta}_1,$ using some weight $w$, s.t., $0 < w < 1.$ We will say that the Hybrid mechanism has \textit{optimal weighing} and denote this weight by $w^*,$ if the weight minimizes the mean squared error of the estimate. We will derive $w^*$ in Lemma~\ref{lem:hybrid-error}.
 
 %We use $\theta_0 = \frac{1}{n_0}\sum_{i \in \{1, \dots, n_0\}} x_i$ to represent the true sample mean of the $n_0$ opt-in samples and $\hat{\theta}_0$ for the $\epsilon$-DP estimate of $\theta_0$ that satisfies TCM differential privacy. Note that $\hat{\theta}_0$ is obtained by running OnlyTCM on the data. 
 
@@ -109,7 +109,7 @@ FullLM has expected squared error
 $\mathcal{E}_{\text{FullLM}} = E[(\hat{\theta} - \theta)^2] = \frac{2m^2}{n\epsilon^2}.$
 \end{lem}
 \begin{proof}
-FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n$ random variables distributed according to $Lap(m/\epsilon)$. Then clearly, $\hat{\theta} - \theta = Z/n$ and therefore, by the Central Limit Theorem, $Z \sim Nor(0, 2nm^2/\epsilon^2)$ and the lemma follows. 
+FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n$ random variables distributed according to $Lap(m/\epsilon)$. Then clearly, $\hat{\theta} - \theta = Z/n$ and therefore, by the Central Limit Theorem (CLT), $Z \sim Nor(0, 2nm^2/\epsilon^2)$ and the lemma follows. 
 \end{proof}
 
 \begin{lem}[Expected squared error of OnlyTCM]
@@ -124,7 +124,7 @@ $\hat{\theta} - \theta = (\hat{\theta}_0 - \theta_0) + (1-c)(\theta_0 - \theta_1
 The first term is a Laplace random variable
 $\hat{\theta}_0 - \theta_0 \sim Lap\left(\frac{m}{cn\epsilon}\right).$
 
-The second term is the difference of two sample means, so by the Central Limit Theorem (CLT) and the difference of Normally distributed random variables
+The second term is the difference of two sample means, so by the CLT and the difference of Normally distributed random variables
 $(1-c)(\theta_0 - \theta_1) \sim Nor\left(0, \frac{(1-c)\sigma^2}{cn}\right).$
 
 Therefore, our error follows a Normal-Laplace distribution
@@ -140,7 +140,7 @@ $w^* = \frac{c^2 n \left(\epsilon^2 \sigma^2+2 m^2\right)}{c \epsilon^2 n \sigma
 %$w^* = \frac{\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) n}}{\frac{4 m^2}{c^2 \epsilon^2 n^2}+\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) c n}}.$
 \end{lem}
 
-\ak{Approximately, the optimal w is $\frac{\epsilon^2 \sigma^2+2 m^2}{\frac{\epsilon^2 \sigma^2}{c}+2 m^2}$}
+%\ak{Approximately, the optimal w is $\frac{\epsilon^2 \sigma^2+2 m^2}{\frac{\epsilon^2 \sigma^2}{c}+2 m^2}$}
 
 \begin{proof}
 We prove that $w^*$ is an optimal weighing for the convex combination of the two mean estimates, i.e., that it minimizes the mean squared error of the estimate, at the end of this proof. For now, we study the distribution of the following decomposition of the error
@@ -158,31 +158,37 @@ $(w-c)(\theta_0 - \theta_1) \sim Nor\left(0, \frac{(w-c)^2\sigma^2}{(1-c)cn}\rig
 Putting these together, we see that our error is distributed according to the following instantiation of the Normal-Laplace distribution
 $\hat{\theta} - \theta \sim NL\left(0, \frac{1}{(1-c)n}\left(\frac{(w-c)^2\sigma^2}{c} + \frac{2(1-w)^2 m^2}{\epsilon^2}\right), \frac{wm}{cn\epsilon}\right).$ The statement of the Lemma now follows from Lemma~\ref{nl_secmom}.
 
-Now it is easy to see by taking the derivative that $w^*$ minimizes $E[(\hat{\theta} - \theta)^2]$.
+Now it is easy to see by taking the derivative that $w^*$ minimizes $E[(\hat{\theta} - \theta)^2].$
 \end{proof}
 
-We can now compute the improvement afforded by the Hybrid mechanism using the optimal weighting as compared to the best of the two benchmarks. The improvement depends on several parameters because the accuracy of OnlyTCM and FullLM varies with them as per Lemmas~\ref{MSE_FullLM} and~\ref{MSE_OnlyTCM}. 
+%We can simplify the expression for $\mathcal{E}_{\text{Hybrid}}$ to $\mathcal{E}_{\text{Hybrid}} = \frac{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}{\epsilon^2 n \left(c \epsilon^2 n \sigma^2+2 m^2 (c (c n-1)+1)\right)}.$
+
+We can now compute the improvement afforded by the Hybrid mechanism using the optimal weighting as compared to the best of the two benchmarks. %The improvement depends on several parameters because the accuracy of OnlyTCM and FullLM varies with them as per Lemmas~\ref{MSE_FullLM} and~\ref{MSE_OnlyTCM}. 
 
 \begin{thm}[Hybrid vs. Benchmarks]\label{thm:main}
 %Define $\mathcal{E}_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $\mathcal{E}_{\text{OnlyTCM}}$, $\mathcal{E}_{\text{Hybrid}}$ be similarly defined.
 Let $R = \frac{\min(\mathcal{E}_{\text{FullLM}}, \mathcal{E}_{\text{OnlyTCM}})}{\mathcal{E}_{\text{Hybrid}}}$.
 Then, 
-$$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}, \text{where } \gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$$
+$$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}, \text{where } \gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2+(1-c) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$$
 \end{thm}
 The proof follows from algebraic manipulation of results of Lemmas~\ref{MSE_FullLM}, \ref{MSE_OnlyTCM}, \ref{lem:hybrid-error}.
 
-Theorem~\ref{thm:main} is difficult to interpret as it makes clear that the improvement that can be achieved by using the Hybrid approach depends on all parameters of the model: the number of samples, the opt-in rate, the distribution, and the desired privacy parameter.
+Theorem~\ref{thm:main} is difficult to interpret as it makes clear that the improvement that can be achieved by using the Hybrid approach depends on all parameters of the model: the number of samples, the opt-in rate, the distribution, the data universe, and the desired privacy parameter.
 
-Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ Then, if $c>c_{\text{critical}}$ and $n > n_{\text{critical}}$, OnlyTCM has a smaller error than FullLM. While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
+Let us first compute when $\mathcal{E}_{\text{FullLM}} \geq \mathcal{E}_{\text{OnlyTCM}}.$  Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ By means of algebraic manipulation, it is easy to see that if $c>c_{\text{critical}}$ and $n \geq n_{\text{critical}}$, then $\mathcal{E}_{\text{FullLM}} \geq \mathcal{E}_{\text{OnlyTCM}}.$ %OnlyTCM has a smaller error than FullLM. 
+In other words, as intuitively expected given the sample complexity results, when the opt-in rate is sufficiently large and the number of samples is sufficiently large, the DP mean estimate obtained from the opt-in samples will be more accurate than if all data was received using the LM. In this case, the improvement offered by using the Hybrid model is at most $R = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}.$
+
+While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
+
+$\frac{2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2 }{2 m^2 + c \epsilon^2 \sigma^2 (-c n+n+1)}$
 
 \begin{cor}
 The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}.$
 \end{cor}
 
 \ak{Can you elaborate further on Theorem 4.4. and Corollary implications, and write about the figures?}
-Theorem~\ref{thm:main} and its corollary provide a lower bound for the potential improvement provided by the hybrid model. Note that this improvement factor is 
 
-\TODO{The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter.}
+%\TODO{The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter.}
 
 \begin{figure}[t]
 %\centering
