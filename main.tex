@@ -213,25 +213,24 @@ Perhaps a more tractable result would be to show that hybrid mechanisms perform 
 \input{preliminaries}
 
 \section{Sample Complexity Results}\label{sec:sample-complexity}
-Let $\alpha$ be the accuracy parameter and $\beta$ be the confidence parameter. Then, the following table describes the sample complexities of algorithms for mean estimation in the local model and the trusted curator model. Note that  \cite{duchi} shows that the Laplace mechanism is optimal for one-dimensional mean estimation in both models of trust.
+Let $\alpha$ be the accuracy parameter and $\beta$ be the confidence parameter. The following table describes the sample complexities of algorithms for mean estimation in the local model and the trusted curator model. %Note that  \cite{duchi} shows that the Laplace mechanism is optimal for one-dimensional mean estimation in both models of trust.
+\TODO{write what sample complexity and $\alpha$ and $\beta$ mean, number of samples sufficient to get an accurate estimate with high probability  }
+
 \begin{center}
 \begin{tabular}{ |c|c|c| }
  \hline
- $\sim [0,m]$ & S. Complexity & Algorithm \\ [1.5ex]
+ $\sim [0,m]$ & Sample Complexity & Optimal Algorithm~\cite{duchi} \\ [1.5ex]
  \hline
- Local & $ \frac{8}{\epsilon^2 \alpha^2} \ln\left(\frac{2}{\beta}\right)$ & Laplace \\ [1.5ex]
+ LM & $ \frac{8}{\epsilon^2 \alpha^2} \ln\left(\frac{2}{\beta}\right)$ & Laplace \\ [1.5ex]
  \hline
  TCM & $\frac{1}{\epsilon \alpha}\ln\left(\frac{1}{\beta}\right)$ & Laplace \\ [1.5ex]
  \hline
 \end{tabular}
 \end{center}
 
-The sample complexity for the local model uses the concentration of the sum of i.i.d. Laplace random variables given in \cite{chan2011private}. The sample complexity for the trusted curator model comes from the accuracy statement of the Laplace mechanism in \cite{dmns06}.
+The sample complexity derivation for the local model uses the concentration of the sum of i.i.d. Laplace random variables given in~\cite{chan2011private}. The sample complexity derivation for the trusted curator model comes from the accuracy statement of the Laplace mechanism in~\cite{dmns06}.
 
-We also explored the idea of comparing the performance of hybrid mechanism with alternatives in terms of their sample complexity, i.e., showing that the number of samples sufficient to get an accurate estimate with high probability in the hybrid model is less than the number of samples necessary to achieve the same for the benchmark mechanisms \ak{benchmark not defined}, but this proved difficult for several reasons. First, we found that the bound on the concentration of the sum of Laplace random variables in~\cite{chan2011private} is nice to work with analytically, but is far from tight. In addition, the inherent lack of strength of the union bound limits what we can say about errors with several terms in their algebraic expressions. \ak{Example?} 
+In addition to comparing the performance of hybrid mechanism with alternatives using mean squared errors, we also explored the idea of comparing them in terms of  sample complexity. This proved difficult and un-informative for several reasons. First, we found that the bound on the concentration of the sum of Laplace random variables in~\cite{chan2011private} is nice to work with analytically, but is far from tight. In addition, the inherent lack of strength of the union bound limits what we can say about errors with several terms in their algebraic expressions.
 
-
-
-Another measure of performance we considered was absolute error. The trouble with this approach came from the difficulty in integrating one-sided probability density functions that arose from the convolution of several random variables, whether it was several Laplace random variables or a Laplace random variable and a Normal random variable. Finally, we decided that mean squared error was both comparatively straight-forward to calculate and, because of this, gave us a much more precise characterization of the performance of our mechanism against the benchmarks.
-
+Another measure of performance we considered was absolute error. The trouble with this approach came from the difficulty in integrating one-sided probability density functions that arose from the convolution of several random variables, whether it was several Laplace random variables or a Laplace random variable and a Normal random variable. In comparison, the mean squared error was both comparatively straight-forward to calculate and gave us a precise characterization of the performance. \TODO{Some references that in the literature absolute error and mean squared error are both used in practice?}
 \end{document}
