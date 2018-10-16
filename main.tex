@@ -106,7 +106,7 @@ We now study the accuracy improvement the Hybrid mechanism provides over the ben
 \begin{lem}[Expected squared error of FullLM]
 \label{MSE_FullLM}
 FullLM has expected squared error
-$E[(\hat{\theta} - \theta)^2] = \frac{2m^2}{n\epsilon^2}.$
+$\mathcal{E}_{\text{FullLM}} = E[(\hat{\theta} - \theta)^2] = \frac{2m^2}{n\epsilon^2}.$
 \end{lem}
 \begin{proof}
 FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n$ random variables distributed according to $Lap(m/\epsilon)$. Then clearly, $\hat{\theta} - \theta = Z/n$ and therefore, by the Central Limit Theorem, $Z \sim Nor(0, 2nm^2/\epsilon^2)$ and the lemma follows. 
@@ -115,7 +115,7 @@ FullLM returns estimate $\hat{\theta} = \theta + Z/n$ where $Z$ is the sum of $n
 \begin{lem}[Expected squared error of OnlyTCM]
 \label{MSE_OnlyTCM}
 OnlyTCM has expected squared error
-$E[(\hat{\theta} - \theta)^2] = \frac{1}{cn}\left((1-c)\sigma^2 + \frac{2m^2}{cn \epsilon^2 }\right).$
+$\mathcal{E}_{\text{OnlyTCM}} = E[(\hat{\theta} - \theta)^2] = \frac{1}{cn}\left((1-c)\sigma^2 + \frac{2m^2}{cn \epsilon^2 }\right).$
 \end{lem}
 \begin{proof}
 OnlyTCM returns the estimate $\hat{\theta} = \hat{\theta}_0$. Then we would like to study the following decomposition of the error
@@ -134,7 +134,7 @@ Thus, the conclusion follows from Lemma~\ref{nl_secmom}.
 
 \begin{lem}[Expected squared error of Hybrid]\label{lem:hybrid-error}
 Hybrid has expected squared error 
-$E[(\hat{\theta} - \theta)^2] = \frac{1}{(1-c)n}\left(\frac{(w^*-c)^2\sigma^2}{c} + \frac{2(1-w^*)^2 m^2}{\epsilon^2}\right) + \frac{2m^2w^{*2}}{c^2n^2\epsilon^2},$
+$\mathcal{E}_{\text{Hybrid}} = E[(\hat{\theta} - \theta)^2] = \frac{1}{(1-c)n}\left(\frac{(w^*-c)^2\sigma^2}{c} + \frac{2(1-w^*)^2 m^2}{\epsilon^2}\right) + \frac{2m^2w^{*2}}{c^2n^2\epsilon^2},$
 where
 $w^* = \frac{\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) n}}{\frac{4 m^2}{c^2 \epsilon^2 n^2}+\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) c n}}.$
 \end{lem}
@@ -158,18 +158,15 @@ $\hat{\theta} - \theta \sim NL\left(0, \frac{1}{(1-c)n}\left(\frac{(w-c)^2\sigma
 Now it is easy to see by taking the derivative that $w^*$ minimizes $E[(\hat{\theta} - \theta)^2]$.
 \end{proof}
 
-We can now analyze the improvement afforded by the optimal naive Hybrid mechanism presented above. We compare to the best of the two benchmarks. This depends on several parameters because the accuracy of OnlyTCM and FullLM vary with the parameters as per Lemmas~\ref{MSE_FullLM} and~\ref{MSE_OnlyTCM}. 
+We can now compute the improvement afforded by the Hybrid mechanism using the optimal weighting as compared to the best of the two benchmarks. The improvement depends on several parameters because the accuracy of OnlyTCM and FullLM varies with them as per Lemmas~\ref{MSE_FullLM} and~\ref{MSE_OnlyTCM}. 
 
 \begin{thm}[Hybrid vs. Benchmarks]\label{thm:main}
-Define $\mathcal{E}_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $\mathcal{E}_{\text{OnlyTCM}}$, $\mathcal{E}_{\text{Hybrid}}$ be similarly defined.
-Let 
-$R = \frac{\min(\mathcal{E}_{\text{FullLM}}, \mathcal{E}_{\text{OnlyTCM}})}{\mathcal{E}_{\text{Hybrid}}}$.
+%Define $\mathcal{E}_{\text{FullLM}}$ to be $E[(\hat{\theta} - \theta)]$ where $\hat{\theta}$ is returned by FullLM and let $\mathcal{E}_{\text{OnlyTCM}}$, $\mathcal{E}_{\text{Hybrid}}$ be similarly defined.
+Let $R = \frac{\min(\mathcal{E}_{\text{FullLM}}, \mathcal{E}_{\text{OnlyTCM}})}{\mathcal{E}_{\text{Hybrid}}}$.
 Then, 
-$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}$
-where 
-$\gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$
+$$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}, \text{where } \gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$$
 \end{thm}
-\ak{Missing proof!} \yd{The proof is just plugging in and algebra, what should be written for this?}
+The proof follows from algebraic manipulation of results of Lemmas~\ref{MSE_FullLM}, \ref{MSE_OnlyTCM}, \ref{lem:hybrid-error}.
 
 Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ Then, if $c>c_{\text{critical}}$ and $n > n_{\text{critical}}$, OnlyTCM has a smaller error than FullLM. While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
 
