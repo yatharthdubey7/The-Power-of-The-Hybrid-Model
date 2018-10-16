@@ -136,8 +136,11 @@ Thus, the conclusion follows from Lemma~\ref{nl_secmom}.
 Hybrid has expected squared error 
 $\mathcal{E}_{\text{Hybrid}} = E[(\hat{\theta} - \theta)^2] = \frac{1}{(1-c)n}\left(\frac{(w^*-c)^2\sigma^2}{c} + \frac{2(1-w^*)^2 m^2}{\epsilon^2}\right) + \frac{2m^2w^{*2}}{c^2n^2\epsilon^2},$
 where
-$w^* = \frac{\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) n}}{\frac{4 m^2}{c^2 \epsilon^2 n^2}+\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) c n}}.$
+$w^* = \frac{c^2 n \left(\epsilon^2 \sigma^2+2 m^2\right)}{c \epsilon^2 n \sigma^2+2 m^2 (c (c n-1)+1)}.$
+%$w^* = \frac{\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) n}}{\frac{4 m^2}{c^2 \epsilon^2 n^2}+\frac{4 m^2}{(1-c) \epsilon^2 n}+\frac{2 \sigma^2}{(1-c) c n}}.$
 \end{lem}
+
+\ak{Approximately, the optimal w is $\frac{\epsilon^2 \sigma^2+2 m^2}{\frac{\epsilon^2 \sigma^2}{c}+2 m^2}$}
 
 \begin{proof}
 We prove that $w^*$ is an optimal weighing for the convex combination of the two mean estimates, i.e., that it minimizes the mean squared error of the estimate, at the end of this proof. For now, we study the distribution of the following decomposition of the error
@@ -167,6 +170,8 @@ Then,
 $$R = \gamma \cdot \frac{\epsilon^2 n \left(2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2\right)}{2 c \epsilon^2 m^2 \sigma^2 (-c n+n+1)+4 m^4}, \text{where } \gamma = \min \left(\frac{2 m^2}{\epsilon^2 n},\frac{2 m^2-(c-1) c \epsilon^2 n \sigma^2}{c^2 \epsilon^2 n^2}\right).$$
 \end{thm}
 The proof follows from algebraic manipulation of results of Lemmas~\ref{MSE_FullLM}, \ref{MSE_OnlyTCM}, \ref{lem:hybrid-error}.
+
+Theorem~\ref{thm:main} is difficult to interpret as it makes clear that the improvement that can be achieved by using the Hybrid approach depends on all parameters of the model: the number of samples, the opt-in rate, the distribution, and the desired privacy parameter.
 
 Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ Then, if $c>c_{\text{critical}}$ and $n > n_{\text{critical}}$, OnlyTCM has a smaller error than FullLM. While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
 
