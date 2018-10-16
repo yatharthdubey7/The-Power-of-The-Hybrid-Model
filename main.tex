@@ -68,7 +68,7 @@ In this work we explore the power of the hybrid model of differential privacy (D
 
 Differential privacy (DP), introduced by~\cite{dmns06}, has become the de facto standard of privacy in the computer science literature dealing with machine learning and statistical data analysis. Two traditional models of trust in the literature are the \textit{trusted curator model} and the \textit{local model}. In the trusted curator model, the analyst sees the true sample data and is able to calibrate noise to the sensitivity of the query. In the local model, the analyst is only able to access samples through some locally randomizing oracle. This means that each sample comes with noise calibrated to the sensitivity of the domain. Until recently, these models were employed mutually exclusively in practice. It is well understood theoretically and empirically that accuracy guarantees are far better in the trusted-curator model than in the local model \TODO{cite theoretical work, \cite{bittau2017prochlo}}. In practice, as discussed in more detail in \cite{blender}, it may often be the case that some small constant fraction of the samples trust the analyst while the rest require local randomization. In this case, the analyst has two natural options which we will use as benchmarks against which to compare the hybrid mechanism proposed here. First, the analyst could satisfy local DP for all of the samples. Second, the analyst could use only the opt-in samples and calibrate the noise appropriately. In this work, we consider how an analyst can improve their accuracy guarantees by running a query on each population and, satisfying exactly the privacy preferences of the two populations, outputting an optimal convex combination of the two query outputs.
 
-In particular, we study the problem of mean estimation for arbitrary distributions in bounded support. We consider a hybrid mechanism that calculates a DP estimate of the mean of the opt-in samples (i.e., those who trust the analyst) and calculates the mean of the locally randomized samples and then outputs a convex combination of the two. The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter. We compare this hybrid mechanism with the benchmarks outlined at the end of the previous paragraph \ak{weren't quite outlined, better to make concrete here than reference previous ones} \yd{what about now? should I still redefine the benchmarks, or is it more clear now?}. We characterize the outputs of these mechanisms as random variables and analyze the performance of our mechanisms using mean squared error.\footnote{We also explored the idea of comparing the performance of hybrid mechanism with alternatives in terms of their sample complexity, i.e., showing that the number of samples sufficient to get an accurate estimate with high probability in the hybrid model is less than the number of samples necessary to achieve the same for the benchmark mechanisms \ak{benchmark not defined}, but this proved difficult for several reasons. First, we found that the bound on the concentration of the sum of Laplace random variables in~\cite{Chan:2011:PCR:2043621.2043626} is nice to work with analytically, but is far from tight. In addition, the inherent lack of strength of the union bound limits what we can say about errors with several terms in their algebraic expressions. \ak{Example?} 
+In particular, we study the problem of mean estimation for arbitrary distributions in bounded support. We consider a hybrid mechanism that calculates a DP estimate of the mean of the opt-in samples (i.e., those who trust the analyst) and calculates the mean of the locally randomized samples and then outputs a convex combination of the two. The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter. We compare this hybrid mechanism with the benchmarks outlined at the end of the previous paragraph \ak{weren't quite outlined, better to make concrete here than reference previous ones} \yd{what about now? should I still redefine the benchmarks, or is it more clear now?}. We characterize the outputs of these mechanisms as random variables and analyze the performance of our mechanisms using mean squared error.\footnote{We also explored the idea of comparing the performance of hybrid mechanism with alternatives in terms of their sample complexity, i.e., showing that the number of samples sufficient to get an accurate estimate with high probability in the hybrid model is less than the number of samples necessary to achieve the same for the benchmark mechanisms \ak{benchmark not defined}, but this proved difficult for several reasons. First, we found that the bound on the concentration of the sum of Laplace random variables in~\cite{chan2011private} is nice to work with analytically, but is far from tight. In addition, the inherent lack of strength of the union bound limits what we can say about errors with several terms in their algebraic expressions. \ak{Example?} 
 
 Another measure of performance we considered was absolute error. The trouble with this approach came from the difficulty in integrating one-sided probability density functions that arose from the convolution of several random variables, whether it was several Laplace random variables or a Laplace random variable and a Normal random variable. Finally, we decided that mean squared error was both comparatively straight-forward to calculate and, because of this, gave us a much more precise characterization of the performance of our mechanism against the benchmarks.}
 
@@ -85,74 +85,11 @@ We explore how much we can improve the accuracy of our estimate by using a hybri
 We use $\theta = \frac{1}{n}\sum_{i \in [n]}x_i$ to represent the true sample mean of all $n$ individuals. $\hat{\theta}$ will represent the analyst's $\epsilon$-DP estimate of the sample mean. We use $\theta_0 = \frac{1}{n_0}\sum_{i \in \{1, \dots, n_0\}} x_i$ to represent the true sample mean of the $n_0$ opt-in samples and $\hat{\theta}_0$ for the $\epsilon$-DP estimate of $\theta_0$ that satisfies TCM differential privacy. Note that $\hat{\theta}_0$ is obtained by running OnlyTCM on the data. Analogously, $\theta_1 = \frac{1}{n_1}\sum_{i \in \{n_0+1, \dots, n\}} x_i$ represents the true sample mean of the $n_1$ individuals who prefer LM differential privacy and $\hat{\theta}_1$ is the $\epsilon$-DP estimate of $\theta_1$ that satisfies LM differential privacy. Note that $\hat{\theta}_1$ is obtained by running FullLM on the $n_1$ samples that prefer local randomization. Hybrid returns the estimate
 $\hat{\theta} = w^*\hat{\theta}_0 + (1-w^*)\hat{\theta}_1$.
 
-\section{Preliminaries}
-We derive expected squared errors using the moment generating functions (mgf) of the Laplace, Gaussian, and Normal-Laplace distributions. Thus in this section, we present the relevant functions and derive the second moment about the origin for each. These expressions will then be used in calculating the expected squared errors of the mechanisms of interest in Section~\ref{sec:performance}. 
-
-\begin{lem}[2nd moment about origin, Laplace distribution]
-Let $X \sim Lap(b)$. Then, $E[X^2] = 2b^2.$
-\end{lem}
-\begin{proof}
-The moment generating function for $X$ is $M_X(t) = \frac{1}{1 - t^2b^2}.$
-Then, $M''_X(t) = -\frac{2b^2(3b^2t^2 + 1)}{(b^2t^2 - 1)^3}.$
-Plugging in $t = 0$, we get 
-$E[X^2] = M''_X(0) = -\frac{2b^2}{(-1)^3} = 2b^2.$
-\end{proof}
-
-The Normal random variables relevant for the work have $\mu = 0$, so we focus on the central moments of the Normal distribution.
-
-\begin{lem}[2nd central moment about origin, Normal distribution~\cite{papoulis2002probability}]
-Let $X \sim Nor(0, \sigma^2)$. Then,
-$E[X^2] = \sigma^2.$
-\end{lem}
-
-We will also need to consider the error of the sum of a Laplace random variable and a Normal random variable. %Thus, characterizing the distribution of such a random variable will prove essential.
-\begin{defn}[Normal-Laplace distribution~\cite{Reed2006}]
-A random variable $Y \overset{d}{=} Z + W,$ where $Z \sim Nor(\mu, \sigma^2)$ and $W \sim Lap(b)$, is distributed according to the Normal-Laplace distribution, which we denote $Y \sim NL(\mu, \sigma^2, b)$.
-\end{defn}
-
-As we did with the Normal distribution above, we focus on central moments of the Normal-Laplace distribution.
-\begin{lem}[2nd central moment about origin, Normal-Laplace distribution]
-\label{nl_secmom}
-Let $X \sim NL(0, \sigma^2, b)$. Then, 
-$E[X^2] = \sigma^2 + 2b^2.$
-\end{lem}
-\begin{proof}
-The moment generating function for $X$ is
-$M_X(t) = \frac{\exp(\sigma^2t^2/2)}{1 - b^2t^2}.$
-Then, as the lemma states
-$E[X^2] = M''_X(0) = \sigma^2 + 2b^2.$
-\end{proof}
-
-We will also need the following property of the Laplace distribution. 
-\begin{lem} \label{wtimeslap}
-Let $X \sim Lap(b)$ and $Y = wX$ where $w \in [0,1]$ is a constant. Then, 
-$Y \sim Lap(wb).$
-\end{lem}
-\begin{proof}
-Let $F_X$ be the cumulative distribution function (cdf) of $X$ and $f_X$ be the probability density function (pdf) of $X$. Let $F_Y$ and $f_Y$ be the same for $Y$. Then, by definition we have 
-$F_Y(y) = Pr[Y \leq y] = Pr[X \leq y/w] = F_X(y/w).$
-	
-Evaluating the cdf of the Laplace distribution at $y/w$, we get 
-$F_X(y/w) = 
-	\begin{cases} 
-      \frac{1}{2}e^{\frac{y}{bw}} & y < 0 \\
-      1 - \frac{1}{2}e^{-\frac{y}{bw}} & y \geq 0 
-	\end{cases} .$
-	
-Finally, we translate the cdfs to pdfs and the lemma follows immediately, \\
-$f_Y(b) = \frac{d}{dy}F_Y(y) = \frac{d}{dy}F_X(y/w) $
-$= \frac{1}{2bw}
-	\begin{cases} 
-      e^{\frac{y}{bw}} & y < 0 \\
-      e^{-\frac{y}{bw}} & y \geq 0 
-	\end{cases}
-     = f_X(wb).$
-\end{proof}
 
 
 
 \section{Performance of Hybrid Mechanism}\label{sec:performance}
-In this section we study the hybrid mechanism and the accuracy improvement it provides over the benchmarks, OnlyTCM and FullLM. We study the accuracy of these mechanisms by modeling their errors as random variables and studying their expectations, in particular, their second moments about the origin.
+In this section we study the hybrid mechanism and the accuracy improvement it provides over the benchmarks, OnlyTCM and FullLM. We study the accuracy of these mechanisms by modeling their errors as random variables and studying their expectations, in particular, their second moments about the origin. The derivations of second moments for the Laplace distribution, Normal distribution, and the Normal-Laplace distribution which are needed to compute the squared errors can be found in Appendix~\ref{sec:preliminaries}.
 
 \begin{lem}[Expected squared error of FullLM]
 \label{MSE_FullLM}
@@ -259,7 +196,10 @@ Perhaps a more tractable result would be to show that hybrid mechanisms perform 
 \bibliographystyle{alpha}
 
 \appendix
-\section{Related Sample Complexity Results}
+\section{Preliminaries}\label{sec:preliminaries}
+\input{preliminaries}
+
+\section{Sample Complexity Results}\label{sec:sample-complexity}
 Let $\alpha$ be the accuracy parameter and $\beta$ be the confidence parameter. Then, the following table describes the sample complexities of algorithms for mean estimation in the local model and the trusted curator model. Note that  \cite{duchi} shows that the Laplace mechanism is optimal for one-dimensional mean estimation in both models of trust.
 \begin{center}
 \begin{tabular}{ |c|c|c| }

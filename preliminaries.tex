@@ -1,0 +1,63 @@
+%\section{Preliminaries}\label{sec:preliminaries}
+We derive expected squared errors using the moment generating functions (mgf) of the Laplace, Gaussian, and Normal-Laplace distributions. Thus in this section, we present the relevant functions and derive the second moment about the origin for each. These expressions will then be used in calculating the expected squared errors of the mechanisms of interest in Section~\ref{sec:performance}. 
+
+\begin{lem}[2nd moment about origin, Laplace distribution]
+Let $X \sim Lap(b)$. Then, $E[X^2] = 2b^2.$
+\end{lem}
+\begin{proof}
+The moment generating function for $X$ is $M_X(t) = \frac{1}{1 - t^2b^2}.$
+Then, $M''_X(t) = -\frac{2b^2(3b^2t^2 + 1)}{(b^2t^2 - 1)^3}.$
+Plugging in $t = 0$, we get 
+$E[X^2] = M''_X(0) = -\frac{2b^2}{(-1)^3} = 2b^2.$
+\end{proof}
+
+The Normal random variables relevant for the work have $\mu = 0$, so we focus on the central moments of the Normal distribution.
+
+\begin{lem}[2nd central moment about origin, Normal distribution~\cite{papoulis2002probability}]
+Let $X \sim Nor(0, \sigma^2)$. Then,
+$E[X^2] = \sigma^2.$
+\end{lem}
+
+We will also need to consider the error of the sum of a Laplace random variable and a Normal random variable. %Thus, characterizing the distribution of such a random variable will prove essential.
+\begin{defn}[Normal-Laplace distribution~\cite{Reed2006}]
+A random variable $Y \overset{d}{=} Z + W,$ where $Z \sim Nor(\mu, \sigma^2)$ and $W \sim Lap(b)$, is distributed according to the Normal-Laplace distribution, which we denote $Y \sim NL(\mu, \sigma^2, b)$.
+\end{defn}
+
+As we did with the Normal distribution above, we focus on central moments of the Normal-Laplace distribution.
+\begin{lem}[2nd central moment about origin, Normal-Laplace distribution]
+\label{nl_secmom}
+Let $X \sim NL(0, \sigma^2, b)$. Then, 
+$E[X^2] = \sigma^2 + 2b^2.$
+\end{lem}
+\begin{proof}
+The moment generating function for $X$ is
+$M_X(t) = \frac{\exp(\sigma^2t^2/2)}{1 - b^2t^2}.$
+Then, as the lemma states
+$E[X^2] = M''_X(0) = \sigma^2 + 2b^2.$
+\end{proof}
+
+We will also need the following property of the Laplace distribution. 
+\begin{lem} \label{wtimeslap}
+Let $X \sim Lap(b)$ and $Y = wX$ where $w \in [0,1]$ is a constant. Then, 
+$Y \sim Lap(wb).$
+\end{lem}
+\begin{proof}
+Let $F_X$ be the cumulative distribution function (cdf) of $X$ and $f_X$ be the probability density function (pdf) of $X$. Let $F_Y$ and $f_Y$ be the same for $Y$. Then, by definition we have 
+$F_Y(y) = Pr[Y \leq y] = Pr[X \leq y/w] = F_X(y/w).$
+	
+Evaluating the cdf of the Laplace distribution at $y/w$, we get 
+$F_X(y/w) = 
+	\begin{cases} 
+      \frac{1}{2}e^{\frac{y}{bw}} & y < 0 \\
+      1 - \frac{1}{2}e^{-\frac{y}{bw}} & y \geq 0 
+	\end{cases} .$
+	
+Finally, we translate the cdfs to pdfs and the lemma follows immediately, \\
+$f_Y(b) = \frac{d}{dy}F_Y(y) = \frac{d}{dy}F_X(y/w) $
+$= \frac{1}{2bw}
+	\begin{cases} 
+      e^{\frac{y}{bw}} & y < 0 \\
+      e^{-\frac{y}{bw}} & y \geq 0 
+	\end{cases}
+     = f_X(wb).$
+\end{proof}
