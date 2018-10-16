@@ -176,17 +176,17 @@ The proof follows from algebraic manipulation of results of Lemmas~\ref{MSE_Full
 Theorem~\ref{thm:main} is difficult to interpret as it makes clear that the improvement that can be achieved by using the Hybrid approach depends on all parameters of the model: the number of samples, the opt-in rate, the distribution, the data universe, and the desired privacy parameter.
 
 Let us first compute when $\mathcal{E}_{\text{FullLM}} \geq \mathcal{E}_{\text{OnlyTCM}}.$  Let $c_{\text{critical}} = \frac{\epsilon^2 \sigma^2}{\epsilon^2 \sigma^2+2 m^2}$ and let $n_{\text{critical}} = \frac{2 m^2}{c^2 \epsilon^2 \sigma^2+2 c^2 m^2-c \epsilon^2 \sigma^2}.$ By means of algebraic manipulation, it is easy to see that if $c>c_{\text{critical}}$ and $n \geq n_{\text{critical}}$, then $\mathcal{E}_{\text{FullLM}} \geq \mathcal{E}_{\text{OnlyTCM}}.$ %OnlyTCM has a smaller error than FullLM. 
-In other words, as intuitively expected given the sample complexity results, when the opt-in rate is sufficiently large and the number of samples is sufficiently large, the DP mean estimate obtained from the opt-in samples will be more accurate than if all data was received using the LM. In this case, the improvement offered by using the Hybrid model is at most $R = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}.$
+In other words, as intuitively expected given the sample complexity results, when the opt-in rate is sufficiently large and the number of samples is sufficiently large, the DP mean estimate obtained from the opt-in samples will be more accurate than if all data was received using the LM. In this case, the improvement offered by using the Hybrid model is at most $R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2} \leq \frac{\epsilon^2\sigma^2+4m^2}{\epsilon^2\sigma^2+2m^2-1} \approx 2.$
 
-While $n \leq n_{\text{critical}}$, FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
+The more interesting case, given that the motivation for the hybrid model comes from the desire to deploy DP by companies with smaller number of users, is when $n \leq n_{\text{critical}}.$ In that case, $\mathcal{E}_{\text{FullLM}} < \mathcal{E}_{\text{OnlyTCM}},$ and the factor of improvement is $R = \frac{2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2 }{2 m^2 + c \epsilon^2 \sigma^2 (-c n+n+1)}.$ It is easy to check algebraically that this expression is maximized at $n = n_{\text{critical}}$ and is equal to $R_{\text{max}}.$
 
-$\frac{2 m^2 \left(c^2 n-c+1\right)+c \epsilon^2 n \sigma^2 }{2 m^2 + c \epsilon^2 \sigma^2 (-c n+n+1)}$
+%$FullLM has smaller error than OnlyTCM and the factor of improvement ($R$) increases linearly with $n$. 
 
 \begin{cor}
 The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R_{\text{max}} = \frac{2 (2-c) m^2}{(c-1) \epsilon^2 \sigma^2+2 m^2}.$
 \end{cor}
 
-\ak{Can you elaborate further on Theorem 4.4. and Corollary implications, and write about the figures?}
+Figures~\ref{fig:1} and~\ref{fig:2} illustrate the relative performance of the mechanisms and the multiplicative improvement achieved by Hybrid for a particular choice of $\epsilon, m, c, \sigma^2,$ and a range of $n$.
 
 %\TODO{The optimal weight for the convex combination depends on several parameters, such as the opt-in rate, total number of samples, the range of the support, and the privacy parameter.}
 
@@ -194,23 +194,27 @@ The maximum value of $R$ is achieved at $n_{\text{critical}}$ and is equal to $R
 %\centering
 \begin{minipage}[t]{.49\textwidth}
 \includegraphics[width=0.99\linewidth]{eps01c01.pdf}
-\caption{Relative performance of models for $c=0.01, \epsilon=0.1, m=1, \sigma = m/6$}
+\caption{Relative performance of models,\\ assuming $c=0.01, \epsilon=0.1, m=1, \sigma = m/6$}
+\label{fig:1}
 \end{minipage}
 %\end{figure}
 %\begin{figure}[t]
 %\centering
 \begin{minipage}[t]{.49\textwidth}
 \includegraphics[width=0.99\linewidth]{imp_eps01c01.pdf}
-\caption{Multiplicative improvement (R) given by Hybrid for $c=0.01, \epsilon=0.1, m=1, \sigma = m/6$}
+\caption{Multiplicative improvement (R) achieved by Hybrid}
+\label{fig:2}
 \end{minipage}
 \end{figure}
 
 \section{Conclusions and Future Directions}
-In this work, we looked at the accuracy of mean estimation algorithms in a hybrid trust environment. We propose a hybrid mechanism that calculates a DP estimate of the mean of the opt-in samples (i.e., those who trust the analyst) and calculates the mean of the locally randomized samples and then outputs a convex combination of the two. In particular, we showed that such a mechanism, where the weight of the convex combination is calculated to minimize mean squared error, can do a constant factor better for a large range of sample sizes, where the constant factor depends on several parameters.
+We showed that the hybrid model holds some promise for enabling wider adoption of DP by analyzing the performance of a simple hybrid mechanism for the task of mean estimation and demonstrating that in scenarios with small sample sizes it gives a lower error compared to alternatives.
 
-Although for the problem of mean estimation, we were able to only do a constant factor better, we believe that there is more promise in considering hybrid mechanisms for more complex problems. \cite{Kasiviswanathan:2011:WLP:2078965.2078976} show that there exists separation between the class of problems that can be solved in the non-interactive local model and those that can be solved in the interactive local model. We conjecture that a hybrid mechanism that uses the opt-in samples to inform the local randomization can buy an increase in power similar to what is bought by interactivity. Therefore, a natural extension to our work is to show separation for hybrid DP and local DP. In particular, we would like to show that hybrid DP allows us to solve a natural variant of the masked parity problem from \cite{Kasiviswanathan:2011:WLP:2078965.2078976} that remains hard in the non-interactive local DP setting.
+%In this work, we looked at the accuracy of mean estimation algorithms in a hybrid trust environment. We propose a hybrid mechanism that calculates a DP estimate of the mean of the opt-in samples (i.e., those who trust the analyst) and calculates the mean of the locally randomized samples and then outputs a convex combination of the two. In particular, we showed that such a mechanism, where the weight of the convex combination is calculated to minimize mean squared error, can do a constant factor better for a large range of sample sizes, where the constant factor depends on several parameters.
 
-Perhaps a more tractable result would be to show that hybrid mechanisms perform better than the natural benchmarks for all counting queries. \cite{Blum:2005:PPS:1065167.1065184} show that counting queries are a powerful primitive that captures a large variety of machine learning and data-mining tasks, and therefore, showing that hybrid mechanisms can improve privacy-accuracy trade-offs for this class of queries and quantifying by how much would illustrate the power and limitations that can be gained by relying on a hybrid trust model. 
+Although for the problem of mean estimation the improvement is only a constant factor, we believe that there is additional promise in considering more sophisticated hybrid mechanisms for more complex problems. We conjecture that a hybrid mechanism that uses the opt-in samples to inform the local randomization (as done by~\cite{blender}) can significant increase utility. The conjecture stems from our analogy to the power of interactivity, where separation results between the class of problems that can be solved in the non-interactive LM and those that can be solved in the interactive LM are known~\cite{Kasiviswanathan:2011:WLP:2078965.2078976}. Thus, a natural extension to our work is to show separation for hybrid DP and local DP. % e.g., by showing that hybrid DP allows us to solve a natural variant of the masked parity problem from \cite{Kasiviswanathan:2011:WLP:2078965.2078976} that remains hard in the non-interactive local DP setting.
+
+%Perhaps a more tractable result would be to show that hybrid mechanisms perform better than the natural benchmarks for all counting queries. \cite{Blum:2005:PPS:1065167.1065184} show that counting queries are a powerful primitive that captures a large variety of machine learning and data-mining tasks, and therefore, showing that hybrid mechanisms can improve privacy-accuracy trade-offs for this class of queries and quantifying by how much would illustrate the power and limitations that can be gained by relying on a hybrid trust model. 
 
 
 
